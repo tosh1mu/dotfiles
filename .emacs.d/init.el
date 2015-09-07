@@ -1,5 +1,3 @@
-;;; Code:
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ site-lisp                                                     ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -11,6 +9,18 @@
   (normal-top-level-add-subdirs-to-load-path)
   )
 
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+;;; @ load path                                                     ;;;
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
+
+(defun add-to-load-path (&rest paths)
+  (let (path)
+	(dolist (path paths paths)
+	  (let ((default-directory
+			  (expand-file-name (concat user-emacs-directory path))))
+		(add-to-list 'load-path default-directory)
+		(if (fboundp 'normal-top-level-add-subdirs-to-load-path)
+		    (normal-top-level-add-subdirs-to-load-path))))))
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
@@ -97,14 +107,13 @@
 ;; フォントサイズ リセット
 (global-set-key (kbd "M-0") '(lambda() (interactive) (text-scale-set 0)))
 
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - frame                                                ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 
 (setq default-frame-alist
       (append '((width                . 85)  ; フレーム幅
-                (height               . 50 ) ; フレーム高
+                (height               . 45 ) ; フレーム高
              ;; (left                 . 70 ) ; 配置左位置
              ;; (top                  . 28 ) ; 配置上位置
                 (line-spacing         . 0  ) ; 文字間隔
@@ -141,6 +150,13 @@
 ;; 列番号の表示
 (column-number-mode t)
 
+;; 時間の表示
+(setq display-time-24hr-format t)
+(display-time-mode t)
+
+;; バッテリー状況の表示
+(display-battery-mode t)
+
 ;; モードライン カスタマイズ
 (setq-default
  mode-line-format
@@ -168,6 +184,17 @@
    )
  )
 (setq mode-line-frame-identification " ")
+
+;; 選択範囲の列数・行数表示
+(defun count-lines-and-chars ()
+  (if mark-active
+	  (format "%d lines, %d chars "
+			  (count-lines (region-beginning) (region-end))
+			  (- (region-end) (region-beginning)))
+	""))
+
+(add-to-list 'default-mode-line-format
+			 '(:eval (count-lines-and-chars)))
 
 ;; cp932エンコードの表記変更
 (coding-system-put 'cp932 :mnemonic ?P)
@@ -285,7 +312,6 @@
 ;; 文字サイズ
 (set-face-attribute 'linum nil :height 0.75)
 
-
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - tabbar                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -318,7 +344,6 @@
 ;; タブ切り替え
 (global-set-key (kbd "<C-tab>") 'tabbar-forward-tab)
 (global-set-key (kbd "C-q")     'tabbar-backward-tab)
-
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ search - isearch                                              ;;;
@@ -559,6 +584,17 @@
 ;; (load-theme 'solarized-dark t)
 (load-theme 'gnupack-dark t)
 
+;; 背景を透過
+(cond
+ ((or (equal window-system 'ns) (equal window-system 'w32))
+  (setq default-frame-alist
+      (append
+       (list
+		'(alpha . (95 75 50 25))
+		)
+       default-frame-alist))
+  )
+ )
 
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ server                                                        ;;;
@@ -595,10 +631,5 @@
     (eval-print-last-sexp)))
 
 (el-get 'sync)
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ Ruby                                                          ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-
 
 ;;; ends here

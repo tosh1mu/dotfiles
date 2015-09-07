@@ -634,13 +634,13 @@ into the migemo's regexp pattern."
 	       (not (or isearch-regexp isearch-word)))
       (setq ad-return-value (concat str " " ret)))))
 
-;;;; for isearch-lazy-highlight (Emacs 21)
+;;;; for lazy-highlight (Emacs 21)
 ;; Avoid byte compile warningsfor other emacsen
-(defvar isearch-lazy-highlight-wrapped)
-(defvar isearch-lazy-highlight-start)
-(defvar isearch-lazy-highlight-end)
+(defvar lazy-highlight-wrapped)
+(defvar lazy-highlight-start)
+(defvar lazy-highlight-end)
 
-(defun migemo-isearch-lazy-highlight-search ()
+(defun migemo-lazy-highlight-search ()
   "Search ahead for the next or previous match, for lazy highlighting.
 Attempt to do the search exactly the way the pending isearch would.
 This function used with Megemo feature."
@@ -660,16 +660,16 @@ This function used with Megemo feature."
 		 (nth 0 choices) (nth 1 choices))
 	     pattern
              (if isearch-forward
-                 (if isearch-lazy-highlight-wrapped
-                     isearch-lazy-highlight-start
+                 (if lazy-highlight-wrapped
+                     lazy-highlight-start
                    (window-end))
-               (if isearch-lazy-highlight-wrapped
-                   isearch-lazy-highlight-end
+               (if lazy-highlight-wrapped
+                   lazy-highlight-end
                  (window-start)))
              t)))
 
-(when (fboundp 'isearch-lazy-highlight-search)
-  (defalias 'isearch-lazy-highlight-search 'migemo-isearch-lazy-highlight-search))
+(when (fboundp 'lazy-highlight-search)
+  (defalias 'lazy-highlight-search 'migemo-lazy-highlight-search))
 
 ;;;; for isearch-highlightify-region (XEmacs 21)
 (when (fboundp 'isearch-highlightify-region)
@@ -699,12 +699,12 @@ This function used with Megemo feature."
     (unless (or isearch-regexp isearch-word)
       (discard-input)
       (setq migemo-isearch-enable-p (not migemo-isearch-enable-p)))
-    (when (fboundp 'isearch-lazy-highlight-new-loop)
-      (let ((isearch-lazy-highlight-last-string nil))
+    (when (fboundp 'lazy-highlight-new-loop)
+      (let ((lazy-highlight-last-string nil))
 	(condition-case nil
-	    (isearch-lazy-highlight-new-loop)
+	    (lazy-highlight-new-loop)
 	  (error
-	   (isearch-lazy-highlight-new-loop nil nil)))))
+	   (lazy-highlight-new-loop nil nil)))))
     (isearch-message))
 
   (defun migemo-isearch-yank-char ()
